@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Rozha+One&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --saffron: #ff6b00;
+  --saffron-glow: #ff8c00;
+  --maroon: #3b0909;
+  --crimson: #1a0303;
+  --gold: #d4af37;
+  --gold-light: #f3e5ab;
+  --cream: #fdfbf7;
+  --sand: #f4ebd9;
+  --ink: #0b0e14;
+  --surface: #131822;
+  --border-gold: rgba(212, 175, 55, 0.25);
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(255, 107, 0, 0.4);
+  color: var(--cream);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--ink);
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--gold), var(--maroon));
+  border-radius: 8px;
+}
+
+.font-dev {
+  font-family: 'Rozha One', 'Tiro Devanagari Hindi', serif;
+}
+.font-dev-body {
+  font-family: 'Tiro Devanagari Hindi', serif;
+}
+.font-display {
+  font-family: 'Cinzel', serif;
+}
+.font-body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.text-gold-gradient {
+  background: linear-gradient(120deg, var(--gold-light) 0%, var(--gold) 45%, var(--saffron-glow) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-saffron-gradient {
+  background: linear-gradient(120deg, #ffd9a8 0%, var(--saffron-glow) 55%, var(--saffron) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glass-gold {
+  background: linear-gradient(145deg, rgba(212, 175, 55, 0.08), rgba(59, 9, 9, 0.35));
+  border: 1px solid var(--border-gold);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.gold-frame {
+  border: 1px solid rgba(212, 175, 55, 0.55);
+  box-shadow:
+    0 0 0 1px rgba(212, 175, 55, 0.15),
+    0 0 40px rgba(212, 175, 55, 0.12),
+    inset 0 0 30px rgba(212, 175, 55, 0.06);
+}
+
+.hero-vignette {
+  background:
+    radial-gradient(ellipse 70% 60% at 70% 40%, rgba(255, 107, 0, 0.14), transparent 60%),
+    radial-gradient(ellipse 60% 70% at 20% 80%, rgba(59, 9, 9, 0.5), transparent 65%),
+    radial-gradient(ellipse 120% 100% at 50% 0%, transparent 40%, var(--ink) 100%);
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin-slow {
+  animation: spin-slow 60s linear infinite;
+}
+
+@keyframes aura-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.06);
+  }
+}
+.animate-aura {
+  animation: aura-pulse 5s ease-in-out infinite;
+}
+
+@keyframes flame-flicker {
+  0%,
+  100% {
+    transform: scaleY(1) translateY(0);
+    opacity: 0.9;
+  }
+  30% {
+    transform: scaleY(1.12) translateY(-1px);
+    opacity: 1;
+  }
+  60% {
+    transform: scaleY(0.94);
+    opacity: 0.75;
+  }
+}
+.animate-flame {
+  animation: flame-flicker 1.6s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee-x 55s linear infinite;
+}
+
+@keyframes live-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.55);
+  }
+  60% {
+    box-shadow: 0 0 0 9px rgba(239, 68, 68, 0);
+  }
+}
+.animate-live-dot {
+  animation: live-pulse 1.8s ease-out infinite;
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+.animate-float {
+  animation: float-soft 7s ease-in-out infinite;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+}

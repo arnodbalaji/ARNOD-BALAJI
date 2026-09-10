@@ -1,0 +1,139 @@
+{
+  "theme": {
+    "mode": "dark",
+    "primary_archetype": "SACRED_GOLD_SAFFRON",
+    "palette": {
+      "saffron_bhagva": "#FF6B00",
+      "saffron_glow": "#FF8C00",
+      "dark_maroon": "#3B0909",
+      "deep_crimson": "#1A0303",
+      "warm_gold": "#D4AF37",
+      "gold_light": "#F3E5AB",
+      "cream_ivory": "#FDFBF7",
+      "soft_sand": "#F4EBD9",
+      "deep_navy_charcoal": "#0B0E14",
+      "surface_dark": "#131822",
+      "border_gold_subtle": "rgba(212, 175, 55, 0.25)"
+    },
+    "typography": {
+      "devanagari_heading_font": "'Rozha One', 'Yatra One', 'Cinzel', serif",
+      "devanagari_body_font": "'Tiro Devanagari Hindi', 'Rozha One', serif",
+      "english_heading_font": "'Cinzel', 'Playfair Display', serif",
+      "english_body_font": "'Plus Jakarta Sans', 'Inter', sans-serif",
+      "monospace_font": "'JetBrains Mono', monospace"
+    }
+  },
+  "user_provided_assets": {
+    "hero_murti": {
+      "url": "https://customer-assets-wrfwihn1.emergentagent.net/job_bhakti-arnod/artifacts/dqwsck8o_IMG-20260904-WA0005.webp",
+      "description": "Real Murti photograph of Shri Sankat Haran Balaji Maharaj Mandir, Arnod (Garbhagriha)",
+      "treatment": "Spotlight radial glow behind, golden ornate arch border, zero overlay blocking face, subtle divine light particle canvas"
+    },
+    "sadhu_1_jagannath_ji": {
+      "url": "https://customer-assets-wrfwihn1.emergentagent.net/job_bhakti-arnod/artifacts/atsomq1g_%E0%A4%B6%E0%A5%8D%E0%A4%B0%E0%A5%80%20%E0%A4%9C%E0%A4%97%E0%A4%A8%E0%A5%8D%E0%A4%A8%E0%A4%AE%E0%A4%BE%E0%A4%A5%20%E0%A4%9C%E0%A5%80%20%E0%A4%AE%E0%A4%B9%E0%A4%B0%E0%A4%BE%E0%A4%9C%20%28%E0%A4%B9%E0%A5%8B%E0%A4%B0%E0%A5%80%20%E0%A4%B9%E0%A4%A8%E0%A5%81%E0%A4%AE%E0%A4%BE%E0%A4%A8%E0%A4%9C%E0%A5%80%20%E0%A4%B5%E0%A4%BE%E0%A4%B2%E0%A5%87%20%E0%A4%AC%E0%A4%BE%E0%A4%AC%E0%A4%9C%E0%A5%80%29.webp",
+      "title": "श्री श्री १००८ श्री जगन्नाथ जी महाराज",
+      "subtitle": "श्री होरी हनुमान जी वाले बाबाजी",
+      "treatment": "Respectful large portrait card, golden foil border, subtle aura glow"
+    },
+    "sadhu_2_sant": {
+      "url": "https://customer-assets-wrfwihn1.emergentagent.net/job_bhakti-arnod/artifacts/y8d24jsj_DyXRtLUE_400x400.jpg",
+      "title": "पूज्य संत श्री (Arnod Ashram)",
+      "subtitle": "दिव्य संत परंपरा एवं आध्यात्मिक मार्गदर्शन",
+      "treatment": "Matching golden framed portrait card"
+    }
+  },
+  "supplemental_images": {
+    "diya_lamps_1": "https://images.unsplash.com/photo-1764775086606-9b23aa61352a?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "diya_lamps_row": "https://images.unsplash.com/photo-1730446497495-85e834022cd1?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "diya_night": "https://images.unsplash.com/photo-1783255166190-bee5e9e1294d?crop=entropy&cs=srgb&fm=jpg&q=85"
+  },
+  "central_config_file_spec": {
+    "location": "/app/frontend/src/config/mandirConfig.js",
+    "required_fields": [
+      "templeNameHindi",
+      "templeNameEnglish",
+      "taglineHindi",
+      "locationAddress",
+      "googleMapsUrl",
+      "contactPersons",
+      "aartiTimings",
+      "liveDarshanConfig",
+      "bankDetails",
+      "socialLinks",
+      "festivalsList",
+      "mandirExploreChapters"
+    ]
+  },
+  "key_sections_architecture": [
+    {
+      "id": "hero",
+      "title": "Kinetic Hero with Real Murti & Divine Glow",
+      "components": ["MaskedTextReveal", "MurtiFramedAura", "LiveDarshanQuickBadge", "DivineParticlesCanvas"]
+    },
+    {
+      "id": "editorial-marquee",
+      "title": "Slow Editorial Sacred Ribbon",
+      "components": ["EditorialRibbonMarquee"]
+    },
+    {
+      "id": "explore",
+      "title": "Explore Mandir (Numbered Manifesto Chapters)",
+      "components": ["ManifestoChapterList", "TempleArchitectureGrid", "DivineValues"]
+    },
+    {
+      "id": "schedule",
+      "title": "Mandir Schedule & Daily Aarti Timeline",
+      "components": ["AartiTimeline", "DailyRitualCards"]
+    },
+    {
+      "id": "panchang",
+      "title": "Panchang & Hindu Calendar (Live API Data + Navigation)",
+      "components": ["PanchangTodayCard", "NavigableCalendarGrid", "HolyDatesHighlighter"]
+    },
+    {
+      "id": "festivals",
+      "title": "Hindu Festivals",
+      "components": ["FestivalCardsGrid", "FestivalCountdownBanner"]
+    },
+    {
+      "id": "live-darshan",
+      "title": "Live Darshan Hub",
+      "components": ["InstagramLiveStatusCard", "LiveToggleSwitch", "YouTubeChannelCard", "InstagramFeedConnect"]
+    },
+    {
+      "id": "seva-donation",
+      "title": "Seva & Donation",
+      "components": ["SevaCards", "QRCodeComingSoonModal", "ConfigurableBankFields", "SecurityNote"]
+    },
+    {
+      "id": "saints-blessings",
+      "title": "संतों का आशीर्वाद (Blessings of Saints)",
+      "components": ["SadhuPortraitCard1", "SadhuPortraitCard2", "DivineQuoteBanner"]
+    },
+    {
+      "id": "contact",
+      "title": "Mandir Seva Karmi & Location",
+      "components": ["ContactCardKushSoni", "ContactCardRishabhJain", "GoogleMapsDirectionsButton"]
+    },
+    {
+      "id": "footer",
+      "title": "Premium Dark Footer",
+      "components": ["FooterLinks", "JaiShriBalajiBanner", "CopyrightAndCredit"]
+    }
+  ],
+  "motion_and_effects": {
+    "lenis": "Smooth momentum scrolling enabled",
+    "framer_motion": "Scroll reveals, staggered list entrances, interactive hover cards, aura pulses",
+    "divine_particles": "Subtle golden light embers canvas floating upward gently",
+    "mandala_rotation": "Slow ambient rotation in background (60s loop)",
+    "diya_flame": "Flickering warm glow micro-animations"
+  },
+  "instructions_to_main_agent": [
+    "1. Ensure all content reads directly from /app/frontend/src/config/mandirConfig.js so any field can be edited in one place.",
+    "2. NEVER replace or obscure user-provided real photos (Hero Murti, Sadhu 1, Sadhu 2). Maintain crisp gold frames around sadhu cards.",
+    "3. Use Devanagari typography with Google Fonts (@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Rozha+One&family=Tiro+Devanagari+Hindi&display=swap');) in index.html or index.css.",
+    "4. All interactive buttons, cards, inputs, and toggles MUST include data-testid attributes (e.g. data-testid='live-darshan-toggle', data-testid='call-kush-soni-button').",
+    "5. Use Lucide icons + custom SVG Mandalas + Sonner toasts for notifications.",
+    "6. Include the live Hindu Panchang API integration with graceful fallback data if API network fails."
+  ]
+}
