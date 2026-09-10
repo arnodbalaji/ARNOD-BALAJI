@@ -19,8 +19,8 @@ const MANDIR_CONFIG = {
     "https://www.google.com/maps/search/?api=1&query=Shri+Sankat+Haran+Balaji+Maharaj+Mandir+Arnod+Pratapgarh+Rajasthan",
 
   // ---------- Social / External Links (replace with real URLs) ----------
-  instagramUrl: "https://www.instagram.com/", // TODO: paste temple Instagram profile URL
-  youtubeUrl: "https://www.youtube.com/", // TODO: paste temple YouTube channel URL
+  instagramUrl: "https://www.instagram.com/srisankatharanbalajimaharaj",
+  youtubeUrl: "https://www.youtube.com/@sankatharanbalaji",
 
   // ---------- Live Darshan ----------
   liveDarshan: {

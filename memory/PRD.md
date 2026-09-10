@@ -38,7 +38,8 @@ Premium, modern techy-spiritual website for **Shri Sankat Haran Balaji Maharaj M
 - 2026-09-10: Full v1 site — all 16 core requirements, live Swiss-Ephemeris panchang engine, lenis + framer-motion motion system, real photos integrated, verified end-to-end (curl + screenshots desktop/mobile).
 
 ## Pending User Inputs (P0)
-- Instagram profile URL, YouTube channel URL, official Google Maps share link (currently placeholder/search links in `mandirConfig.js`)
+- Instagram profile URL ✅ (2026-09-10: instagram.com/srisankatharanbalajimaharaj), YouTube channel URL ✅ (youtube.com/@sankatharanbalaji)
+- Official Google Maps share link (currently a maps search link in `mandirConfig.js`)
 - Name & title of the second (younger) sant — photo has no text; currently "पूज्य संत श्री" placeholder
 - Actual aarti/darshan timings (placeholders: "समय शीघ्र घोषित होगा")
 - Official UPI QR image + bank details (empty by design)
