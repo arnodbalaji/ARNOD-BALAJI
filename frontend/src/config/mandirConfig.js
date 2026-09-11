@@ -223,7 +223,7 @@ const MANDIR_CONFIG = {
   // ---------- Music / Streaming platforms ----------
   musicLinks: [
     { label: "WhatsApp Channel", sub: "मंदिर अपडेट सीधे WhatsApp पर", icon: "chat", url: "https://whatsapp.com/channel/0029VbBLPeZEgGfDMHT1Ev09" },
-    { label: "Arnod Balaji (Songs)", sub: "भजन एवं भक्ति गीत चैनल", icon: "youtube", url: "https://www.youtube.com/@srisankatharanbalajimaharajman" },
+    { label: "Arnod Balaji (Songs)", sub: "भजन एवं भक्ति गीत चैनल", icon: "youtube", url: "https://www.youtube.com/@arnodbalaji" },
     { label: "YouTube Music", sub: "भजन सुनें YouTube Music पर", icon: "music", url: "https://music.youtube.com/channel/UCQCYNHOtnk1NZbS4OUob0fA" },
     { label: "Spotify", sub: "Mandir Songs on Spotify", icon: "music", url: "https://open.spotify.com/artist/5Tu1ttfY400yt7jDdM9FmS" },
     { label: "Apple Music", sub: "Mandir Songs on Apple Music", icon: "music", url: "https://music.apple.com/us/artist/sri-sankatharan-balaji-maharaj-mandir-songs/1808988321" },
