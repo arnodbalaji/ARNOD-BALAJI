@@ -6,6 +6,7 @@ import { scrollToId } from "../lib/scroll";
 
 const LINKS = [
   { id: "home", label: "Home" },
+  { id: "saints", label: "Sant Darshan" },
   { id: "explore", label: "Explore Mandir" },
   { id: "schedule", label: "Schedule" },
   { id: "panchang", label: "Panchang & Calendar" },
@@ -57,13 +58,13 @@ export default function Navbar() {
           </span>
         </button>
 
-        <div className="hidden lg:flex items-center gap-6">
+        <div className="hidden lg:flex items-center gap-4 xl:gap-5">
           {LINKS.slice(1).map((l) => (
             <button
               key={l.id}
               data-testid={`nav-link-${l.id}`}
               onClick={() => go(l.id)}
-              className="text-[13px] font-medium text-[#fdfbf7]/70 hover:text-[#f3e5ab] transition-colors duration-300 tracking-wide"
+              className="text-xs font-medium text-[#fdfbf7]/70 hover:text-[#f3e5ab] transition-colors duration-300 tracking-wide"
             >
               {l.label}
             </button>

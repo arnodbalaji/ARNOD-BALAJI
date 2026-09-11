@@ -222,14 +222,14 @@ const MANDIR_CONFIG = {
 
   // ---------- Music / Streaming platforms ----------
   musicLinks: [
-    { label: "WhatsApp Channel", sub: "मंदिर अपडेट सीधे WhatsApp पर", icon: "chat", url: "https://whatsapp.com/channel/0029VbBLPeZEgGfDMHT1Ev09" },
-    { label: "Arnod Balaji (Songs)", sub: "भजन एवं भक्ति गीत चैनल", icon: "youtube", url: "https://www.youtube.com/@arnodbalaji" },
-    { label: "YouTube Music", sub: "भजन सुनें YouTube Music पर", icon: "music", url: "https://music.youtube.com/channel/UCQCYNHOtnk1NZbS4OUob0fA" },
-    { label: "Spotify", sub: "Mandir Songs on Spotify", icon: "music", url: "https://open.spotify.com/artist/5Tu1ttfY400yt7jDdM9FmS" },
-    { label: "Apple Music", sub: "Mandir Songs on Apple Music", icon: "music", url: "https://music.apple.com/us/artist/sri-sankatharan-balaji-maharaj-mandir-songs/1808988321" },
-    { label: "Amazon Music", sub: "Mandir Songs on Amazon Music", icon: "music", url: "https://music.amazon.in/artists/B0F5BDWNH8/sri-sankatharan-balaji-maharaj-mandir-songs" },
-    { label: "Qobuz", sub: "Mandir Songs on Qobuz", icon: "music", url: "https://qobuz.com/us-en/label/sri-sankatharan-balaji-maharaj-mandir-songs/download-streaming-albums/8094228" },
-    { label: "JioSaavn", sub: "Mandir Songs on JioSaavn", icon: "music", url: "https://www.jiosaavn.com/artist/sri-sankatharan-balaji-maharaj-mandir-songs/Tm6H0vxApXQ_" },
+    { label: "WhatsApp Channel", sub: "मंदिर अपडेट सीधे WhatsApp पर", brand: "whatsapp", url: "https://whatsapp.com/channel/0029VbBLPeZEgGfDMHT1Ev09" },
+    { label: "Arnod Balaji (Songs)", sub: "भजन एवं भक्ति गीत चैनल", brand: "youtube", url: "https://www.youtube.com/@arnodbalaji" },
+    { label: "YouTube Music", sub: "भजन सुनें YouTube Music पर", brand: "youtubemusic", url: "https://music.youtube.com/channel/UCQCYNHOtnk1NZbS4OUob0fA" },
+    { label: "Spotify", sub: "Mandir Songs on Spotify", brand: "spotify", url: "https://open.spotify.com/artist/5Tu1ttfY400yt7jDdM9FmS" },
+    { label: "Apple Music", sub: "Mandir Songs on Apple Music", brand: "applemusic", url: "https://music.apple.com/us/artist/sri-sankatharan-balaji-maharaj-mandir-songs/1808988321" },
+    { label: "Amazon Music", sub: "Mandir Songs on Amazon Music", brand: "amazonmusic", url: "https://music.amazon.in/artists/B0F5BDWNH8/sri-sankatharan-balaji-maharaj-mandir-songs" },
+    { label: "Qobuz", sub: "Mandir Songs on Qobuz", brand: "qobuz", url: "https://qobuz.com/us-en/label/sri-sankatharan-balaji-maharaj-mandir-songs/download-streaming-albums/8094228" },
+    { label: "JioSaavn", sub: "Mandir Songs on JioSaavn", brand: "jiosaavn", url: "https://www.jiosaavn.com/artist/sri-sankatharan-balaji-maharaj-mandir-songs/Tm6H0vxApXQ_" },
   ],
 
   // ---------- Panchang location (for calculations only) ----------

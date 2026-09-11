@@ -1,9 +1,11 @@
 import { Instagram, Youtube, MapPin } from "lucide-react";
+import BrandIcon from "./BrandIcon";
 import MANDIR_CONFIG from "../config/mandirConfig";
 import { scrollToId } from "../lib/scroll";
 
 const LINKS = [
   { id: "home", label: "Home" },
+  { id: "saints", label: "Sant Darshan" },
   { id: "explore", label: "Explore Mandir" },
   { id: "schedule", label: "Schedule" },
   { id: "panchang", label: "Panchang" },
@@ -77,6 +79,26 @@ export default function Footer() {
             >
               <Youtube size={18} />
             </a>
+          </div>
+
+          <p className="font-display text-[11px] tracking-[0.35em] uppercase text-[#d4af37]/80 mt-9 mb-4">
+            Bhajan & Updates
+          </p>
+          <div className="flex flex-wrap gap-2.5">
+            {MANDIR_CONFIG.musicLinks.map((l) => (
+              <a
+                key={l.label}
+                data-testid={`footer-music-${l.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+                href={l.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={l.label}
+                title={l.label}
+                className="w-10 h-10 rounded-full border border-[#d4af37]/25 flex items-center justify-center text-[#f3e5ab]/75 hover:bg-[#d4af37]/10 hover:border-[#d4af37] hover:text-[#f3e5ab] transition-colors"
+              >
+                <BrandIcon brand={l.brand} size={15} colored={false} />
+              </a>
+            ))}
           </div>
         </div>
       </div>

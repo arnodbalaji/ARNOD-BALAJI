@@ -10,7 +10,7 @@ export default function Saints() {
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_50%_60%,rgba(59,9,9,0.5),transparent_75%)] pointer-events-none" />
       <div className="relative max-w-5xl mx-auto">
-        <SectionHeading eyebrow="Divine Guidance" titleHi="संतों का आशीर्वाद" titleEn="Blessings of Saints" />
+        <SectionHeading eyebrow="संतों का आशीर्वाद" titleHi="संत दर्शन" titleEn="Blessings of Saints" />
 
         <div className="grid md:grid-cols-2 gap-10">
           {MANDIR_CONFIG.sants.map((sant, i) => (

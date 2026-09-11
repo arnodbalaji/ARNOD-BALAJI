@@ -174,6 +174,86 @@ async def get_panchang_month(year: int, month: int):
     return {"year": year, "month": month, "days": days}
 
 
+FESTIVAL_RULES = [
+    {"key": "hanuman-jayanti", "name_hi": "हनुमान जयंती", "name_en": "Hanuman Jayanti",
+     "hindu": "चैत्र पूर्णिमा", "deity": "श्री हनुमान जी",
+     "desc": "संकटमोचन श्री हनुमान जी के प्राकट्य दिवस का पावन पर्व।",
+     "tithi": 14, "win": [(3, 28), (4, 30)]},
+    {"key": "ram-navami", "name_hi": "राम नवमी", "name_en": "Ram Navami",
+     "hindu": "चैत्र शुक्ल नवमी", "deity": "श्री राम",
+     "desc": "मर्यादा पुरुषोत्तम भगवान श्री राम के जन्म का महापर्व।",
+     "tithi": 8, "win": [(3, 25), (4, 20)]},
+    {"key": "guru-purnima", "name_hi": "गुरु पूर्णिमा", "name_en": "Guru Purnima",
+     "hindu": "आषाढ़ पूर्णिमा", "deity": "गुरु परंपरा",
+     "desc": "गुरु के प्रति श्रद्धा एवं कृतज्ञता का पावन दिन।",
+     "tithi": 14, "win": [(7, 1), (8, 10)]},
+    {"key": "janmashtami", "name_hi": "श्रीकृष्ण जन्माष्टमी", "name_en": "Janmashtami",
+     "hindu": "भाद्रपद कृष्ण अष्टमी", "deity": "श्री कृष्ण",
+     "desc": "भगवान श्री कृष्ण के प्राकट्य का आनंदमयी उत्सव।",
+     "tithi": 22, "win": [(8, 10), (9, 15)]},
+    {"key": "navratri", "name_hi": "शारदीय नवरात्रि", "name_en": "Sharad Navratri",
+     "hindu": "आश्विन शुक्ल प्रतिपदा", "deity": "माँ दुर्गा",
+     "desc": "नौ दिवसीय शक्ति उपासना का पावन पर्व।",
+     "tithi": 0, "win": [(9, 25), (10, 25)]},
+    {"key": "dussehra", "name_hi": "विजयादशमी (दशहरा)", "name_en": "Dussehra",
+     "hindu": "आश्विन शुक्ल दशमी", "deity": "श्री राम",
+     "desc": "अधर्म पर धर्म की विजय का प्रतीक महापर्व।",
+     "tithi": 9, "win": [(10, 1), (10, 31)]},
+    {"key": "diwali", "name_hi": "दीपावली", "name_en": "Diwali",
+     "hindu": "कार्तिक अमावस्या", "deity": "माँ लक्ष्मी",
+     "desc": "दीपों एवं आलोक का महापर्व — अंधकार पर प्रकाश की विजय।",
+     "tithi": 29, "win": [(10, 15), (11, 20)]},
+    {"key": "mahashivratri", "name_hi": "महाशिवरात्रि", "name_en": "Mahashivratri",
+     "hindu": "फाल्गुन कृष्ण चतुर्दशी", "deity": "भगवान शिव",
+     "desc": "भगवान शिव की आराधना की महापुण्य रात्रि।",
+     "tithi": 28, "win": [(2, 20), (3, 20)]},
+]
+
+
+@api_router.get("/festivals/upcoming")
+async def get_upcoming_festivals():
+    import calendar as cal
+    from datetime import timedelta
+
+    today = datetime.now().date()
+    end = today + timedelta(days=400)
+    found = {}
+    y, m = today.year, today.month
+    while date(y, m, 1) <= end and len(found) < len(FESTIVAL_RULES):
+        for day in range(1, cal.monthrange(y, m)[1] + 1):
+            d = date(y, m, day)
+            if d < today:
+                continue
+            rise_jd, _ = _rise_set(y, m, day)
+            p = _panchang_at(rise_jd)
+            for rule in FESTIVAL_RULES:
+                if rule["key"] in found or p["tithi_index"] != rule["tithi"]:
+                    continue
+                (m1, d1), (m2, d2) = rule["win"]
+                if (m, day) >= (m1, d1) and (m, day) <= (m2, d2):
+                    found[rule["key"]] = d
+        m += 1
+        if m > 12:
+            m, y = 1, y + 1
+    out = []
+    for rule in FESTIVAL_RULES:
+        if rule["key"] in found:
+            d = found[rule["key"]]
+            out.append({
+                "key": rule["key"],
+                "name_hi": rule["name_hi"],
+                "name_en": rule["name_en"],
+                "hindu": rule["hindu"],
+                "deity": rule["deity"],
+                "desc": rule["desc"],
+                "date": d.isoformat(),
+                "gregorian": d.strftime("%d %B %Y"),
+                "days_until": (d - today).days,
+            })
+    out.sort(key=lambda f: f["date"])
+    return {"festivals": out}
+
+
 class StatusCheck(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
