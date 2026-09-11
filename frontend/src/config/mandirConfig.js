@@ -49,8 +49,8 @@ const MANDIR_CONFIG = {
       imageKey: "sant1",
     },
     {
-      name: "पूज्य संत श्री", // TODO: replace with sant's name
-      title: "आध्यात्मिक मार्गदर्शन एवं आशीर्वाद", // TODO: replace with sant's title
+      name: "परम् पूज्य गुरुदेव स्वामी अवधेशानंद गिरि जी महाराज",
+      title: "आचार्य महामंडलेश्वर",
       imageKey: "sant2",
     },
   ],
