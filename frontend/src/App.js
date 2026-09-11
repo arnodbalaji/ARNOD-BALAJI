@@ -41,6 +41,7 @@ function App() {
       <main>
         <Hero />
         <Marquee />
+        <Saints />
         <Explore />
         <History />
         <Schedule />
@@ -50,7 +51,6 @@ function App() {
         <YouTubeSection />
         <InstagramSection />
         <Seva />
-        <Saints />
         <Contact />
       </main>
       <Footer />
