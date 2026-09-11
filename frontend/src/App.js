@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Marquee from "./components/Marquee";
 import Explore from "./components/Explore";
+import History from "./components/History";
 import Schedule from "./components/Schedule";
 import Panchang from "./components/Panchang";
 import Festivals from "./components/Festivals";
@@ -41,6 +42,7 @@ function App() {
         <Hero />
         <Marquee />
         <Explore />
+        <History />
         <Schedule />
         <Panchang />
         <Festivals />

@@ -45,7 +45,7 @@ Premium, modern techy-spiritual website for **Shri Sankat Haran Balaji Maharaj M
 - Official UPI QR image + bank details (empty by design)
 
 ## Backlog
-- P1: Temple history section once committee provides facts
+- ~~P1: Temple history section~~ ✅ DONE 2026-09-11 (स्वयंभू बालाजी, संत जगन्नाथ जी आगमन, चमत्कारों की आस्था, आस्था का पवित्र धाम)
 - P1: Festival dates auto-derived from panchang engine (currently editable static list)
 - P2: Photo gallery of mandir events
 - P2: Hindi/English language toggle
