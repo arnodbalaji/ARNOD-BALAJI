@@ -12,6 +12,7 @@ import Panchang from "./components/Panchang";
 import Festivals from "./components/Festivals";
 import LiveDarshan from "./components/LiveDarshan";
 import { YouTubeSection, InstagramSection } from "./components/Social";
+import MusicSection from "./components/Music";
 import Seva from "./components/Seva";
 import Saints from "./components/Saints";
 import Contact from "./components/Contact";
@@ -49,6 +50,7 @@ function App() {
         <Festivals />
         <LiveDarshan />
         <YouTubeSection />
+        <MusicSection />
         <InstagramSection />
         <Seva />
         <Contact />
