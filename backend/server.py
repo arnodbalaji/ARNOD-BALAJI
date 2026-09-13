@@ -806,6 +806,36 @@ async def put_site_settings(request: Request):
     return {"ok": True}
 
 
+# ---------------- Greeting Audio (AI TTS, cached) ----------------
+@api_router.get("/audio/greeting")
+async def greeting_audio():
+    doc = await db.audio_cache.find_one({"key": "jai_shree_ram"})
+    if doc:
+        return Response(
+            content=doc["data"],
+            media_type="audio/mpeg",
+            headers={"Cache-Control": "public, max-age=31536000"},
+        )
+    from emergentintegrations.llm.openai import OpenAITextToSpeech
+
+    tts = OpenAITextToSpeech(api_key=os.environ.get("EMERGENT_LLM_KEY"))
+    audio = await tts.generate_speech(
+        text="जय श्री राम",
+        model="tts-1-hd",
+        voice="echo",
+        speed=0.9,
+        response_format="mp3",
+    )
+    await db.audio_cache.update_one(
+        {"key": "jai_shree_ram"}, {"$set": {"key": "jai_shree_ram", "data": audio}}, upsert=True
+    )
+    return Response(
+        content=audio,
+        media_type="audio/mpeg",
+        headers={"Cache-Control": "public, max-age=31536000"},
+    )
+
+
 class StatusCheck(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))

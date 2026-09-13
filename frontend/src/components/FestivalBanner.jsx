@@ -19,7 +19,7 @@ export default function FestivalBanner() {
   useEffect(() => {
     if (!next || localStorage.getItem("bell_played")) return;
     const arm = () => {
-      playBellOnce();
+      setTimeout(() => playBellOnce(), 2800);
       window.removeEventListener("pointerdown", arm);
       window.removeEventListener("scroll", arm);
     };

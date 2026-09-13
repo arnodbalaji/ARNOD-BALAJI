@@ -24,12 +24,14 @@ import ShlokaOfDay from "./components/ShlokaOfDay";
 import CustomSections from "./components/CustomSections";
 import FestivalBanner from "./components/FestivalBanner";
 import { setLenis } from "./lib/scroll";
+import { armGreeting } from "./lib/greeting";
 
 function App() {
   const isAdmin = window.location.pathname === "/admin";
 
   useEffect(() => {
     if (isAdmin) return;
+    armGreeting();
     const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
     setLenis(lenis);
     let raf;
