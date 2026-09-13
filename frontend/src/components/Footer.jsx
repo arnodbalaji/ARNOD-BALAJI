@@ -2,6 +2,7 @@ import { Instagram, Youtube, MapPin } from "lucide-react";
 import BrandIcon from "./BrandIcon";
 import MANDIR_CONFIG from "../config/mandirConfig";
 import { scrollToId } from "../lib/scroll";
+import { useSettings } from "../lib/useSettings";
 
 const LINKS = [
   { id: "home", label: "Home" },
@@ -16,6 +17,11 @@ const LINKS = [
 ];
 
 export default function Footer() {
+  const settings = useSettings();
+  const mapsUrl = settings.links?.maps || MANDIR_CONFIG.googleMapsUrl;
+  const igUrl = settings.links?.instagram || MANDIR_CONFIG.instagramUrl;
+  const ytUrl = settings.links?.youtube || MANDIR_CONFIG.youtubeUrl;
+
   return (
     <footer data-testid="footer" className="relative bg-[#1a0303] border-t border-[#d4af37]/15 px-5 sm:px-8 pt-16 pb-10">
       <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-12">
@@ -26,7 +32,7 @@ export default function Footer() {
           <p className="mt-2 text-sm text-[#fdfbf7]/55">{MANDIR_CONFIG.addressLine2}</p>
           <a
             data-testid="footer-directions-link"
-            href={MANDIR_CONFIG.googleMapsUrl}
+            href={mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-5 inline-flex items-center gap-2 text-sm text-[#ffb877] hover:text-[#ff8c00] transition-colors"
@@ -61,7 +67,7 @@ export default function Footer() {
           <div className="flex gap-4">
             <a
               data-testid="footer-instagram-link"
-              href={MANDIR_CONFIG.instagramUrl}
+              href={igUrl}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
@@ -71,7 +77,7 @@ export default function Footer() {
             </a>
             <a
               data-testid="footer-youtube-link"
-              href={MANDIR_CONFIG.youtubeUrl}
+              href={ytUrl}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="YouTube"

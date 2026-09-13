@@ -1,9 +1,13 @@
 import { Instagram, ArrowRight, Radio } from "lucide-react";
 import { Reveal, SectionHeading } from "./Reveal";
 import MANDIR_CONFIG from "../config/mandirConfig";
+import { useSettings } from "../lib/useSettings";
 
 export default function LiveDarshan() {
+  const settings = useSettings();
   const live = MANDIR_CONFIG.liveDarshan;
+  const isLive = settings.live?.isLive ?? live.isLive;
+  const igUrl = settings.links?.instagram || MANDIR_CONFIG.instagramUrl;
 
   return (
     <section id="live-darshan" data-testid="live-darshan-section" className="relative py-28 px-5 sm:px-8 overflow-hidden">
@@ -18,7 +22,7 @@ export default function LiveDarshan() {
           >
             <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full bg-[#ff6b00]/15 blur-3xl pointer-events-none" />
 
-            {live.isLive ? (
+              {isLive ? (
               <>
                 <div className="flex items-center justify-center gap-3">
                   <span className="w-3 h-3 rounded-full bg-red-500 animate-live-dot" />
@@ -49,7 +53,7 @@ export default function LiveDarshan() {
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <a
                 data-testid="watch-live-instagram-button"
-                href={MANDIR_CONFIG.instagramUrl}
+                href={igUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 rounded-full bg-gradient-to-r from-[#ff6b00] to-[#ff8c00] px-8 py-3.5 font-semibold text-[#1a0303] hover:shadow-[0_0_32px_rgba(255,107,0,0.5)] hover:-translate-y-0.5 transition-[box-shadow,transform] duration-300"
@@ -60,7 +64,7 @@ export default function LiveDarshan() {
               </a>
               <a
                 data-testid="follow-instagram-button"
-                href={MANDIR_CONFIG.instagramUrl}
+                href={igUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-full border border-[#d4af37]/50 px-8 py-3.5 font-medium text-[#f3e5ab] hover:bg-[#d4af37]/10 transition-colors duration-300"

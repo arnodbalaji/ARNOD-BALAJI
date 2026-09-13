@@ -1,8 +1,11 @@
 import { Phone, MapPin, ArrowUpRight } from "lucide-react";
 import { Reveal, SectionHeading } from "./Reveal";
 import MANDIR_CONFIG from "../config/mandirConfig";
+import { useSettings } from "../lib/useSettings";
 
 export default function Contact() {
+  const settings = useSettings();
+  const mapsUrl = settings.links?.maps || MANDIR_CONFIG.googleMapsUrl;
   return (
     <section id="contact" data-testid="contact-section" className="relative py-28 px-5 sm:px-8">
       <div className="max-w-5xl mx-auto">
@@ -57,7 +60,7 @@ export default function Contact() {
             </div>
             <a
               data-testid="open-google-maps-button"
-              href={MANDIR_CONFIG.googleMapsUrl}
+              href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 rounded-full bg-gradient-to-r from-[#ff6b00] to-[#ff8c00] px-7 py-3.5 font-semibold text-[#1a0303] hover:shadow-[0_0_28px_rgba(255,107,0,0.45)] hover:-translate-y-0.5 transition-[box-shadow,transform] duration-300 shrink-0"

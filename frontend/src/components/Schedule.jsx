@@ -1,10 +1,13 @@
 import { Sunrise, Bell, Landmark, Sunset, Moon, Info } from "lucide-react";
 import { Reveal, SectionHeading } from "./Reveal";
 import MANDIR_CONFIG from "../config/mandirConfig";
+import { useSettings } from "../lib/useSettings";
 
 const ICONS = { sunrise: Sunrise, bell: Bell, temple: Landmark, sunset: Sunset, moon: Moon };
 
 export default function Schedule() {
+  const settings = useSettings();
+  const items = settings.schedule?.length ? settings.schedule : MANDIR_CONFIG.schedule;
   return (
     <section
       id="schedule"
@@ -17,7 +20,7 @@ export default function Schedule() {
         <div className="relative">
           <span className="absolute left-[27px] sm:left-1/2 top-2 bottom-2 w-px bg-gradient-to-b from-[#d4af37]/40 via-[#ff6b00]/30 to-transparent" />
           <div className="space-y-8">
-            {MANDIR_CONFIG.schedule.map((item, i) => {
+            {MANDIR_CONFIG.schedule.length > 0 && items.map((item, i) => {
               const Icon = ICONS[item.icon] || Bell;
               const left = i % 2 === 0;
               return (

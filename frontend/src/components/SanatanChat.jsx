@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Send, Loader2 } from "lucide-react";
+import { X, Send, Loader2, Mic } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -25,8 +25,27 @@ export default function SanatanChat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [listening, setListening] = useState(false);
   const sessionId = useRef(getSessionId());
   const listRef = useRef(null);
+
+  const startListening = () => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) {
+      setInput("🎤 आपका ब्राउज़र voice input support नहीं करता — कृपया लिखें");
+      return;
+    }
+    const rec = new SR();
+    rec.lang = "hi-IN";
+    rec.interimResults = false;
+    rec.onresult = (e) => {
+      setInput(e.results[0][0].transcript);
+    };
+    rec.onend = () => setListening(false);
+    rec.onerror = () => setListening(false);
+    rec.start();
+    setListening(true);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -186,6 +205,18 @@ export default function SanatanChat() {
                 placeholder="अपना प्रश्न लिखें…"
                 className="flex-1 rounded-full bg-[#131822] border border-[#d4af37]/25 px-4 py-3 text-sm text-[#fdfbf7] placeholder:text-[#fdfbf7]/35 outline-none focus:border-[#ff8c00]/60"
               />
+              <button
+                data-testid="chat-mic-button"
+                onClick={startListening}
+                className={`w-11 h-11 rounded-full border flex items-center justify-center transition-colors ${
+                  listening
+                    ? "border-red-500 bg-red-500/20 text-red-400 animate-pulse"
+                    : "border-[#d4af37]/40 text-[#f3e5ab] hover:bg-[#d4af37]/10"
+                }`}
+                aria-label="Voice input"
+              >
+                <Mic size={17} />
+              </button>
               <button
                 data-testid="chat-send-button"
                 onClick={() => send()}

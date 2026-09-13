@@ -753,6 +753,27 @@ async def youtube_media():
     return data
 
 
+# ---------------- Site Settings (owner CMS) ----------------
+SETTINGS_KEYS = ("live", "links", "schedule", "pinnedVideos")
+
+
+@api_router.get("/settings")
+async def get_site_settings():
+    doc = await db.site_settings.find_one({"key": "site"}, {"_id": 0, "key": 0})
+    return doc or {}
+
+
+@api_router.put("/admin/settings")
+async def put_site_settings(request: Request):
+    await get_owner(request)
+    body = await request.json()
+    allowed = {k: body[k] for k in SETTINGS_KEYS if k in body}
+    await db.site_settings.update_one(
+        {"key": "site"}, {"$set": {"key": "site", **allowed}}, upsert=True
+    )
+    return {"ok": True}
+
+
 class StatusCheck(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))

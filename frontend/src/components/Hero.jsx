@@ -5,6 +5,7 @@ import MANDIR_CONFIG from "../config/mandirConfig";
 import { MaskedLine } from "./Reveal";
 import Particles from "./Particles";
 import { scrollToId } from "../lib/scroll";
+import { useSettings } from "../lib/useSettings";
 
 const Mandala = () => (
   <svg viewBox="0 0 400 400" className="w-full h-full animate-spin-slow opacity-40" aria-hidden="true">
@@ -40,6 +41,9 @@ export default function Hero() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const murtiY = useTransform(scrollYProgress, [0, 1], [0, 90]);
   const glowOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.2]);
+  const settings = useSettings();
+  const isLive = settings.live?.isLive ?? MANDIR_CONFIG.liveDarshan.isLive;
+  const mapsUrl = settings.links?.maps || MANDIR_CONFIG.googleMapsUrl;
 
   return (
     <section
@@ -117,7 +121,7 @@ export default function Hero() {
             </button>
             <a
               data-testid="hero-directions-button"
-              href={MANDIR_CONFIG.googleMapsUrl}
+              href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 rounded-full border border-[#ff6b00]/40 px-7 py-3.5 font-medium text-[#ffb877] hover:bg-[#ff6b00]/10 transition-colors duration-300"
@@ -156,7 +160,7 @@ export default function Hero() {
             </figcaption>
           </motion.figure>
 
-          {MANDIR_CONFIG.liveDarshan.isLive && (
+          {isLive && (
             <button
               data-testid="hero-live-badge"
               onClick={() => scrollToId("live-darshan")}

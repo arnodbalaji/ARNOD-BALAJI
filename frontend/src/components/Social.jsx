@@ -2,13 +2,30 @@ import { useEffect, useState } from "react";
 import { Youtube, Instagram, Play, ArrowUpRight, X, Radio } from "lucide-react";
 import { Reveal, SectionHeading } from "./Reveal";
 import MANDIR_CONFIG from "../config/mandirConfig";
+import { useSettings } from "../lib/useSettings";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+const extractVideoId = (s) => {
+  const m = String(s).match(/(?:v=|youtu\.be\/|shorts\/|embed\/)([\w-]{11})/);
+  if (m) return m[1];
+  const bare = String(s).trim();
+  return /^[\w-]{11}$/.test(bare) ? bare : null;
+};
 
 export function YouTubeSection() {
   const [data, setData] = useState(null);
   const [active, setActive] = useState(0);
   const [playing, setPlaying] = useState(null);
+  const settings = useSettings();
+  const pinnedIds = (settings.pinnedVideos || []).map(extractVideoId).filter(Boolean);
+  const pinned = pinnedIds.map((id) => ({
+    id,
+    title: "📌 Pinned Bhajan",
+    thumb: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
+    url: `https://www.youtube.com/watch?v=${id}`,
+    pinned: true,
+  }));
 
   useEffect(() => {
     fetch(`${API}/media/youtube`)
@@ -19,6 +36,10 @@ export function YouTubeSection() {
 
   const channels = data?.channels || [];
   const current = channels[active];
+  const playlist = [
+    ...pinned,
+    ...(current?.videos || []).filter((v) => !pinnedIds.includes(v.id)),
+  ];
 
   return (
     <section id="youtube" data-testid="youtube-section" className="relative py-24 px-5 sm:px-8">
@@ -74,9 +95,9 @@ export function YouTubeSection() {
         </div>
 
         {/* Videos playlist grid */}
-        {current && current.videos.length > 0 ? (
+        {playlist.length > 0 ? (
           <div data-testid="youtube-playlist" className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-            {current.videos.map((v) => (
+            {playlist.map((v) => (
               <button
                 key={v.id}
                 data-testid={`youtube-video-${v.id}`}
