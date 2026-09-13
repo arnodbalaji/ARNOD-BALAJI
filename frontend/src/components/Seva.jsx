@@ -44,7 +44,7 @@ export default function Seva() {
             >
               {qrImage ? (
                 <img
-                  src={qrImage}
+                  src={qrImage.startsWith("/api") ? `${process.env.REACT_APP_BACKEND_URL}${qrImage}` : qrImage}
                   alt="Mandir UPI QR Code"
                   className="w-56 h-56 rounded-2xl border border-[#d4af37]/40 object-contain bg-white p-2"
                 />

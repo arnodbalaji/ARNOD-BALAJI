@@ -447,10 +447,133 @@ async def put_seva_settings(req: SevaSettings, request: Request):
     return {"ok": True}
 
 
+# ---------------- Object Storage + QR Upload ----------------
+import requests as _requests
+from fastapi import UploadFile, File
+from fastapi.responses import Response
+
+STORAGE_BASE = (os.environ.get("INTEGRATION_PROXY_URL") or "").strip() or "https://integrations.emergentagent.com"
+STORAGE_URL = STORAGE_BASE.rstrip("/") + "/objstore/api/v1/storage"
+APP_NAME = "balaji-arnod"
+_storage_key = None
+
+
+def init_storage(force: bool = False):
+    global _storage_key
+    if _storage_key and not force:
+        return _storage_key
+    resp = _requests.post(
+        f"{STORAGE_URL}/init",
+        json={"emergent_key": os.environ.get("EMERGENT_LLM_KEY")},
+        timeout=30,
+    )
+    resp.raise_for_status()
+    _storage_key = resp.json()["storage_key"]
+    return _storage_key
+
+
+def put_object(path: str, data: bytes, content_type: str) -> dict:
+    resp = _requests.put(
+        f"{STORAGE_URL}/objects/{path}",
+        headers={"X-Storage-Key": init_storage(), "Content-Type": content_type},
+        data=data,
+        timeout=120,
+    )
+    resp.raise_for_status()
+    return resp.json()
+
+
+def get_object(path: str):
+    resp = _requests.get(
+        f"{STORAGE_URL}/objects/{path}",
+        headers={"X-Storage-Key": init_storage()},
+        timeout=60,
+    )
+    resp.raise_for_status()
+    return resp.content, resp.headers.get("Content-Type", "application/octet-stream")
+
+
+ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
+
+
+@api_router.post("/admin/qr-upload")
+async def upload_qr(request: Request, file: UploadFile = File(...)):
+    await get_owner(request)
+    if file.content_type not in ALLOWED_IMAGE_TYPES:
+        raise HTTPException(status_code=400, detail="केवल image file (jpg/png/webp) अपलोड करें")
+    data = await file.read()
+    if len(data) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="फ़ाइल 5MB से छोटी होनी चाहिए")
+    ext = (file.filename.rsplit(".", 1)[-1].lower() if file.filename and "." in file.filename else "png")
+    path = f"{APP_NAME}/uploads/qr/{uuid.uuid4()}.{ext}"
+    result = put_object(path, data, file.content_type)
+    await db.files.insert_one(
+        {
+            "id": str(uuid.uuid4()),
+            "storage_path": result["path"],
+            "original_filename": file.filename,
+            "content_type": file.content_type,
+            "size": result["size"],
+            "is_deleted": False,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+    )
+    url = f"/api/files/{result['path']}"
+    await db.site_settings.update_one(
+        {"key": "seva"}, {"$set": {"key": "seva", "qrImage": url}}, upsert=True
+    )
+    return {"url": url}
+
+
+@api_router.get("/files/{path:path}")
+async def download_file(path: str):
+    if not path.startswith(f"{APP_NAME}/uploads/qr/"):
+        raise HTTPException(status_code=403, detail="Forbidden")
+    record = await db.files.find_one({"storage_path": path, "is_deleted": False})
+    if not record:
+        raise HTTPException(status_code=404, detail="File not found")
+    try:
+        data, content_type = get_object(path)
+    except Exception:
+        raise HTTPException(status_code=404, detail="File not found")
+    return Response(content=data, media_type=record.get("content_type", content_type))
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+def _safe_verify(plain: str, hashed: str) -> bool:
+    try:
+        return verify_password(plain, hashed)
+    except Exception:
+        return False
+
+
+@api_router.put("/auth/change-password")
+async def change_password(req: ChangePasswordRequest, request: Request):
+    email = await get_owner(request)
+    if len(req.new_password) < 8:
+        raise HTTPException(status_code=400, detail="नया पासवर्ड कम से कम 8 अक्षरों का हो")
+    user = await db.users.find_one({"email": email, "role": "owner"})
+    if not user or not _safe_verify(req.current_password, user["password_hash"]):
+        raise HTTPException(status_code=401, detail="वर्तमान पासवर्ड गलत है")
+    await db.users.update_one(
+        {"email": email}, {"$set": {"password_hash": hash_password(req.new_password)}}
+    )
+    return {"ok": True}
+
+
 @app.on_event("startup")
 async def seed_owner():
     await db.users.create_index("email", unique=True)
     await db.login_attempts.create_index("identifier")
+    try:
+        init_storage()
+        logging.getLogger(__name__).info("Storage initialized")
+    except Exception as e:
+        logging.getLogger(__name__).error(f"Storage init failed: {e}")
     if not ADMIN_EMAIL or not ADMIN_PASSWORD:
         return
     existing = await db.users.find_one({"email": ADMIN_EMAIL})
@@ -464,9 +587,27 @@ async def seed_owner():
                 "created_at": datetime.now(timezone.utc).isoformat(),
             }
         )
-    elif not verify_password(ADMIN_PASSWORD, existing["password_hash"]):
+        await db.site_settings.update_one(
+            {"key": "admin_seed"},
+            {"$set": {"key": "admin_seed", "env_password_hash": hash_password(ADMIN_PASSWORD)}},
+            upsert=True,
+        )
+        return
+    marker = await db.site_settings.find_one({"key": "admin_seed"})
+    env_changed = True
+    if marker and _safe_verify(ADMIN_PASSWORD, marker.get("env_password_hash", "")):
+        env_changed = False
+    elif marker is None and _safe_verify(ADMIN_PASSWORD, existing["password_hash"]):
+        env_changed = False
+    if env_changed:
         await db.users.update_one(
             {"email": ADMIN_EMAIL}, {"$set": {"password_hash": hash_password(ADMIN_PASSWORD)}}
+        )
+    if marker is None or env_changed:
+        await db.site_settings.update_one(
+            {"key": "admin_seed"},
+            {"$set": {"key": "admin_seed", "env_password_hash": hash_password(ADMIN_PASSWORD)}},
+            upsert=True,
         )
 
 
