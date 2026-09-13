@@ -108,6 +108,13 @@ export default function Footer() {
         <p className="mt-4 text-xs text-[#fdfbf7]/35 tracking-wide">
           © {new Date().getFullYear()} Shri Sankat Haran Balaji Maharaj Mandir, Arnod · Pratapgarh, Rajasthan
         </p>
+        <a
+          data-testid="footer-owner-login-link"
+          href="/admin"
+          className="mt-3 inline-block text-[11px] text-[#fdfbf7]/25 hover:text-[#d4af37]/70 transition-colors tracking-widest uppercase"
+        >
+          Owner Login
+        </a>
       </div>
     </footer>
   );

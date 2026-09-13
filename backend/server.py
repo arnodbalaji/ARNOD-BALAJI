@@ -343,6 +343,198 @@ async def get_chat_history(session_id: str):
     return {"messages": msgs}
 
 
+# ---------------- Owner Auth (JWT) + Site Settings ----------------
+import jwt
+import bcrypt
+from fastapi import HTTPException, Request
+
+JWT_SECRET = os.environ.get("JWT_SECRET")
+JWT_ALGORITHM = "HS256"
+ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "").lower()
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
+
+
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+
+def verify_password(plain: str, hashed: str) -> bool:
+    return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
+
+
+def create_owner_token(email: str) -> str:
+    from datetime import timedelta
+    payload = {
+        "sub": email,
+        "role": "owner",
+        "exp": datetime.now(timezone.utc) + timedelta(days=7),
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
+async def get_owner(request: Request) -> str:
+    auth = request.headers.get("Authorization", "")
+    token = auth[7:] if auth.startswith("Bearer ") else request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    if payload.get("role") != "owner":
+        raise HTTPException(status_code=403, detail="Forbidden")
+    return payload["sub"]
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+@api_router.post("/auth/login")
+async def owner_login(req: LoginRequest, request: Request):
+    email = req.email.lower().strip()
+    identifier = f"{request.client.host}:{email}"
+    att = await db.login_attempts.find_one({"identifier": identifier})
+    now_iso = datetime.now(timezone.utc).isoformat()
+    if att and att.get("count", 0) >= 5 and att.get("locked_until", "") > now_iso:
+        raise HTTPException(status_code=429, detail="बहुत अधिक प्रयास। 15 मिनट बाद पुनः प्रयास करें।")
+    user = await db.users.find_one({"email": email, "role": "owner"})
+    if not user or not verify_password(req.password, user["password_hash"]):
+        from datetime import timedelta
+        count = (att or {}).get("count", 0) + 1
+        lock = (datetime.now(timezone.utc) + timedelta(minutes=15)).isoformat() if count >= 5 else ""
+        await db.login_attempts.update_one(
+            {"identifier": identifier},
+            {"$set": {"identifier": identifier, "count": count, "locked_until": lock}},
+            upsert=True,
+        )
+        raise HTTPException(status_code=401, detail="गलत ईमेल या पासवर्ड")
+    await db.login_attempts.delete_one({"identifier": identifier})
+    return {
+        "token": create_owner_token(email),
+        "user": {"email": email, "name": user.get("name", "Owner"), "role": "owner"},
+    }
+
+
+@api_router.get("/auth/me")
+async def auth_me(request: Request):
+    email = await get_owner(request)
+    return {"email": email, "role": "owner"}
+
+
+class SevaSettings(BaseModel):
+    qrImage: str = ""
+    accountName: str = ""
+    bankName: str = ""
+    accountNumber: str = ""
+    ifsc: str = ""
+    upiId: str = ""
+
+
+@api_router.get("/seva")
+async def get_seva_settings():
+    doc = await db.site_settings.find_one({"key": "seva"}, {"_id": 0, "key": 0})
+    return doc or {}
+
+
+@api_router.put("/admin/seva")
+async def put_seva_settings(req: SevaSettings, request: Request):
+    await get_owner(request)
+    await db.site_settings.update_one(
+        {"key": "seva"}, {"$set": {"key": "seva", **req.model_dump()}}, upsert=True
+    )
+    return {"ok": True}
+
+
+@app.on_event("startup")
+async def seed_owner():
+    await db.users.create_index("email", unique=True)
+    await db.login_attempts.create_index("identifier")
+    if not ADMIN_EMAIL or not ADMIN_PASSWORD:
+        return
+    existing = await db.users.find_one({"email": ADMIN_EMAIL})
+    if existing is None:
+        await db.users.insert_one(
+            {
+                "email": ADMIN_EMAIL,
+                "password_hash": hash_password(ADMIN_PASSWORD),
+                "name": "Mandir Owner",
+                "role": "owner",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            }
+        )
+    elif not verify_password(ADMIN_PASSWORD, existing["password_hash"]):
+        await db.users.update_one(
+            {"email": ADMIN_EMAIL}, {"$set": {"password_hash": hash_password(ADMIN_PASSWORD)}}
+        )
+
+
+# ---------------- Daily Shloka (AI, cached per day) ----------------
+FALLBACK_SHLOKAS = [
+    {
+        "sanskrit": "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।\nमा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥",
+        "meaning_hi": "हे अर्जुन! कर्म करना ही तेरा अधिकार है, उसके फलों में कभी नहीं। कर्म के फल को अपना उद्देश्य मत बना और अकर्मण्यता से भी आसक्त मत हो।",
+        "source": "श्रीमद्भगवद्गीता · अध्याय २ · श्लोक ४७",
+    },
+    {
+        "sanskrit": "संकट कटै मिटै सब पीरा।\nजो सुमिरै हनुमत बलबीरा॥",
+        "meaning_hi": "जो भक्त बलशाली हनुमान जी का स्मरण करता है, उसके सभी संकट कट जाते हैं और समस्त पीड़ाएँ मिट जाती हैं।",
+        "source": "श्री हनुमान चालीसा",
+    },
+    {
+        "sanskrit": "सर्वधर्मान्परित्यज्य मामेकं शरणं व्रज।\nअहं त्वां सर्वपापेभ्यो मोक्षयिष्यामि मा शुचः॥",
+        "meaning_hi": "सभी धर्मों का त्याग कर केवल मेरी शरण में आ जा। मैं तुझे समस्त पापों से मुक्त कर दूँगा — शोक मत कर।",
+        "source": "श्रीमद्भगवद्गीता · अध्याय १८ · श्लोक ६६",
+    },
+]
+
+
+@api_router.get("/shloka/today")
+async def shloka_today():
+    today = datetime.now().date().isoformat()
+    cached = await db.daily_shloka.find_one({"date": today}, {"_id": 0})
+    if cached:
+        return cached
+    shloka = None
+    try:
+        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        import re
+
+        day_num = int(today.replace("-", ""))
+        src = "श्रीमद्भगवद्गीता" if day_num % 2 == 0 else "हनुमान चालीसा या रामायण परंपरा"
+        chat = LlmChat(
+            api_key=os.environ.get("EMERGENT_LLM_KEY"),
+            session_id=f"shloka-{today}",
+            system_message="You are a Sanatan Dharma scholar. Reply ONLY with valid JSON, no markdown.",
+        )
+        resp = await chat.send_message(
+            UserMessage(
+                text=(
+                    f"आज के लिए {src} से एक प्रेरणादायक श्लोक या चौपाई चुनें। "
+                    'Reply ONLY as JSON: {"sanskrit": "मूल संस्कृत/अवधी पंक्तियाँ", "meaning_hi": "सरल हिन्दी भावार्थ (2-3 पंक्तियाँ)", "source": "सटीक स्रोत"}'
+                )
+            )
+        )
+        match = re.search(r"\{.*\}", resp, re.S)
+        data = json.loads(match.group(0))
+        shloka = {
+            "date": today,
+            "sanskrit": data["sanskrit"],
+            "meaning_hi": data["meaning_hi"],
+            "source": data["source"],
+            "ai": True,
+        }
+    except Exception as e:
+        logging.getLogger(__name__).warning(f"shloka generation failed: {e}")
+    if not shloka:
+        day_of_year = datetime.now().timetuple().tm_yday
+        f = FALLBACK_SHLOKAS[day_of_year % len(FALLBACK_SHLOKAS)]
+        shloka = {"date": today, **f, "ai": False}
+    await db.daily_shloka.update_one({"date": today}, {"$set": shloka}, upsert=True)
+    return shloka
+
+
 class StatusCheck(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))

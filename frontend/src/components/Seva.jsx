@@ -1,15 +1,28 @@
+import { useEffect, useState } from "react";
 import { QrCode, ShieldCheck, Landmark } from "lucide-react";
 import { Reveal, SectionHeading } from "./Reveal";
 import MANDIR_CONFIG from "../config/mandirConfig";
 
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
 export default function Seva() {
   const { seva } = MANDIR_CONFIG;
+  const [live, setLive] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API}/seva`)
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((d) => setLive(d))
+      .catch(() => setLive(null));
+  }, []);
+
+  const qrImage = live?.qrImage || seva.qrImage;
   const bankFields = [
-    { label: "Account Name", value: seva.bank.accountName },
-    { label: "Bank Name", value: seva.bank.bankName },
-    { label: "Account Number", value: seva.bank.accountNumber },
-    { label: "IFSC", value: seva.bank.ifsc },
-    { label: "UPI ID", value: seva.bank.upiId },
+    { label: "Account Name", value: live?.accountName ?? seva.bank.accountName },
+    { label: "Bank Name", value: live?.bankName ?? seva.bank.bankName },
+    { label: "Account Number", value: live?.accountNumber ?? seva.bank.accountNumber },
+    { label: "IFSC", value: live?.ifsc ?? seva.bank.ifsc },
+    { label: "UPI ID", value: live?.upiId ?? seva.bank.upiId },
   ];
   const hasBank = bankFields.some((f) => f.value);
 
@@ -29,9 +42,9 @@ export default function Seva() {
               data-testid="seva-qr-card"
               className="glass-gold rounded-3xl p-10 h-full flex flex-col items-center justify-center text-center"
             >
-              {seva.qrImage ? (
+              {qrImage ? (
                 <img
-                  src={seva.qrImage}
+                  src={qrImage}
                   alt="Mandir UPI QR Code"
                   className="w-56 h-56 rounded-2xl border border-[#d4af37]/40 object-contain bg-white p-2"
                 />

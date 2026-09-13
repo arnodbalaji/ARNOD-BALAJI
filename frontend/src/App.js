@@ -18,10 +18,15 @@ import Saints from "./components/Saints";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import SanatanChat from "./components/SanatanChat";
+import Admin from "./components/Admin";
+import ShlokaOfDay from "./components/ShlokaOfDay";
 import { setLenis } from "./lib/scroll";
 
 function App() {
+  const isAdmin = window.location.pathname === "/admin";
+
   useEffect(() => {
+    if (isAdmin) return;
     const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
     setLenis(lenis);
     let raf;
@@ -35,7 +40,11 @@ function App() {
       lenis.destroy();
       setLenis(null);
     };
-  }, []);
+  }, [isAdmin]);
+
+  if (isAdmin) {
+    return <Admin />;
+  }
 
   return (
     <div className="bg-[#0b0e14] text-[#fdfbf7] min-h-screen">
@@ -43,6 +52,7 @@ function App() {
       <main>
         <Hero />
         <Marquee />
+        <ShlokaOfDay />
         <Saints />
         <Explore />
         <History />
