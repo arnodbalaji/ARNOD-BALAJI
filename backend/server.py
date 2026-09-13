@@ -268,7 +268,7 @@ You hold deep knowledge of the four Vedas, Upanishads, 18 Puranas, Ramayana, Mah
 Rules:
 - Reply in the SAME language the devotee uses (Hindi, Hinglish or English). Prefer simple Hindi; where fitting, include a short Sanskrit shloka with its meaning.
 - Tone: humble, warm, devotional — like a learned temple pujari guiding a devotee. Never preachy.
-- When citing scripture, name the source (e.g., श्रीमद्भगवद्गीता अध्याय 2). If unsure of the exact verse number, describe the teaching and name only the text — never fabricate citations.
+- When citing scripture, name the source (e.g., श्रीमद्भगवद्गीता अध्याय 2). गीता एवं शास्त्रों के उद्धरण हेतु गीता प्रेस गोरखपुर के प्रकाशित संस्करणों को प्रामाणिक मूल स्रोत मानें। If unsure of the exact verse number, describe the teaching and name only the text — never fabricate citations.
 - Keep answers concise (under ~180 words) unless the devotee asks for detail. Use short paragraphs.
 - Mandir facts you may share: प्रातः दर्शन 6 AM, प्रातः आरती 7 AM, मंदिर पूरे दिन खुला, शयन आरती 8 PM; मूर्ति स्वयंभू एवं जागृत मानी जाती है (स्थानीय मान्यता); मंदिर अरणोद, प्रतापगढ़, राजस्थान में स्थित है।
 - Do not invent miracles or historical claims about this mandir beyond the above.
@@ -577,6 +577,7 @@ async def seed_owner():
     if not ADMIN_EMAIL or not ADMIN_PASSWORD:
         return
     existing = await db.users.find_one({"email": ADMIN_EMAIL})
+    await db.users.delete_many({"role": "owner", "email": {"$ne": ADMIN_EMAIL}})
     if existing is None:
         await db.users.insert_one(
             {
@@ -754,7 +755,7 @@ async def youtube_media():
 
 
 # ---------------- Site Settings (owner CMS) ----------------
-SETTINGS_KEYS = ("live", "links", "schedule", "pinnedVideos")
+SETTINGS_KEYS = ("live", "links", "schedule", "pinnedVideos", "instagramReels", "customEvents")
 
 
 @api_router.get("/settings")

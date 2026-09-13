@@ -13,6 +13,8 @@ const extractVideoId = (s) => {
   return /^[\w-]{11}$/.test(bare) ? bare : null;
 };
 
+const isShort = (v) => /#?shorts/i.test(v.title || "");
+
 export function YouTubeSection() {
   const [data, setData] = useState(null);
   const [active, setActive] = useState(0);
@@ -104,7 +106,7 @@ export function YouTubeSection() {
                 onClick={() => setPlaying(v.id)}
                 className="group relative rounded-2xl overflow-hidden border border-[#d4af37]/25 hover:border-[#ff8c00]/60 transition-colors duration-300 text-left"
               >
-                <img src={v.thumb} alt={v.title} loading="lazy" className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-500" />
+                <img src={v.thumb} alt={v.title} loading="lazy" className={`w-full ${isShort(v) ? "aspect-[9/16]" : "aspect-video"} object-cover group-hover:scale-105 transition-transform duration-500`} />
                 <span className="absolute inset-0 bg-black/35 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                   <span className="w-11 h-11 rounded-full bg-red-600/90 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <Play size={18} className="text-white ml-0.5" />
@@ -165,13 +167,15 @@ const reelId = (url) => {
 };
 
 export function InstagramSection() {
+  const settings = useSettings();
   const items = [
     { title: "Live Darshan", desc: "आरती के लाइव प्रसारण की सूचना" },
     { title: "Aarti Updates", desc: "दैनिक आरती एवं दर्शन अपडेट" },
     { title: "Festival Updates", desc: "पर्वों एवं विशेष कार्यक्रमों की जानकारी" },
     { title: "Temple Announcements", desc: "मंदिर की आधिकारिक घोषणाएँ" },
   ];
-  const reels = (MANDIR_CONFIG.instagramReels || [])
+  const reelSource = settings.instagramReels?.length ? settings.instagramReels : MANDIR_CONFIG.instagramReels;
+  const reels = (reelSource || [])
     .map((url) => ({ url, id: reelId(url) }))
     .filter((r) => r.id);
 

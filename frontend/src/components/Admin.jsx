@@ -40,6 +40,8 @@ export default function Admin() {
     links: { instagram: "", youtube: "", maps: "" },
     schedule: MANDIR_CONFIG.schedule,
     pinnedText: "",
+    reelsText: "",
+    events: [],
   });
 
   useEffect(() => {
@@ -60,6 +62,8 @@ export default function Admin() {
           },
           schedule: d.schedule?.length ? d.schedule : MANDIR_CONFIG.schedule,
           pinnedText: (d.pinnedVideos || []).join("\n"),
+          reelsText: (d.instagramReels || []).join("\n"),
+          events: d.customEvents || [],
         }))
       )
       .catch(() => {});
@@ -125,6 +129,8 @@ export default function Admin() {
         links: site.links,
         schedule: site.schedule,
         pinnedVideos: site.pinnedText.split("\n").map((s) => s.trim()).filter(Boolean),
+        instagramReels: site.reelsText.split("\n").map((s) => s.trim()).filter(Boolean),
+        customEvents: site.events.filter((ev) => ev.name.trim()),
       },
       "वेबसाइट सेटिंग सहेज ली गईं ✅"
     );
@@ -221,7 +227,7 @@ export default function Admin() {
               <Lock size={15} />
               <span className="font-display text-[11px] tracking-[0.3em] uppercase">Owner Login</span>
             </div>
-            <input data-testid="owner-email-input" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ईमेल" className={inputCls} />
+            <input data-testid="owner-email-input" type="text" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="नाम (Username)" className={inputCls} />
             <input data-testid="owner-password-input" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="पासवर्ड" className={inputCls} />
             {error && <p data-testid="owner-login-error" className="text-sm text-red-400">{error}</p>}
             <button data-testid="owner-login-button" type="submit" disabled={busy} className="w-full rounded-full bg-gradient-to-r from-[#ff6b00] to-[#ff8c00] py-3.5 font-semibold text-[#1a0303] disabled:opacity-50 flex items-center justify-center gap-2">
@@ -354,6 +360,69 @@ export default function Admin() {
                     placeholder={"https://www.youtube.com/watch?v=…\nhttps://youtube.com/shorts/…"}
                     className={`${inputCls} resize-none`}
                   />
+                </div>
+
+                <div className="pt-2">
+                  <div className="flex items-center gap-2 text-xs text-[#f3e5ab]/70 mb-2">
+                    <Link2 size={13} className="text-[#d4af37]" /> Instagram Reels (हर लाइन में एक reel link)
+                  </div>
+                  <textarea
+                    data-testid="reels-input"
+                    rows={3}
+                    value={site.reelsText}
+                    onChange={(e) => setSite((s) => ({ ...s, reelsText: e.target.value }))}
+                    placeholder={"https://www.instagram.com/reel/…"}
+                    className={`${inputCls} resize-none`}
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-[#f3e5ab]/70">🛕 मंदिर कार्यक्रम (Bhandara / Katha आदि)</span>
+                    <button
+                      data-testid="event-add-button"
+                      onClick={() => setSite((s) => ({ ...s, events: [...s.events, { name: "", date: "", desc: "" }] }))}
+                      className="text-xs rounded-full border border-[#d4af37]/40 px-3 py-1 text-[#f3e5ab] hover:bg-[#d4af37]/10 transition-colors"
+                    >
+                      + जोड़ें
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    {site.events.map((ev, i) => (
+                      <div key={i} className="rounded-xl border border-[#d4af37]/20 p-3 space-y-2">
+                        <div className="flex gap-2">
+                          <input
+                            data-testid={`event-name-${i}`}
+                            value={ev.name}
+                            onChange={(e) => setSite((s) => ({ ...s, events: s.events.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)) }))}
+                            placeholder="कार्यक्रम का नाम"
+                            className={`flex-1 ${inputCls}`}
+                          />
+                          <button
+                            data-testid={`event-remove-${i}`}
+                            onClick={() => setSite((s) => ({ ...s, events: s.events.filter((_, j) => j !== i) }))}
+                            className="px-3 rounded-xl border border-red-500/40 text-red-400 text-xs hover:bg-red-500/10"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        <input
+                          data-testid={`event-date-${i}`}
+                          value={ev.date}
+                          onChange={(e) => setSite((s) => ({ ...s, events: s.events.map((x, j) => (j === i ? { ...x, date: e.target.value } : x)) }))}
+                          placeholder="दिनांक (जैसे: 21 October 2026)"
+                          className={inputCls}
+                        />
+                        <input
+                          data-testid={`event-desc-${i}`}
+                          value={ev.desc}
+                          onChange={(e) => setSite((s) => ({ ...s, events: s.events.map((x, j) => (j === i ? { ...x, desc: e.target.value } : x)) }))}
+                          placeholder="विवरण (वैकल्पिक)"
+                          className={inputCls}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
               <button data-testid="settings-save-button" onClick={saveSite} disabled={busy} className="mt-6 w-full rounded-full bg-gradient-to-r from-[#ff6b00] to-[#ff8c00] py-3.5 font-semibold text-[#1a0303] disabled:opacity-50 flex items-center justify-center gap-2">

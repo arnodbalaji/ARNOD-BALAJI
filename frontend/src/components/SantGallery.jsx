@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Reveal, SectionHeading } from "./Reveal";
 import santGallery from "../config/santGallery.json";
+import Lightbox from "./Lightbox";
 
 export default function SantGallery() {
   const [showAll, setShowAll] = useState(false);
+  const [selected, setSelected] = useState(null);
   const list = showAll ? santGallery : santGallery.slice(0, 12);
 
   return (
@@ -25,7 +27,8 @@ export default function SantGallery() {
             <Reveal key={sant.img} delay={Math.min(i, 8) * 0.04}>
               <figure
                 data-testid={`sant-gallery-${i + 1}`}
-                className="group relative rounded-2xl overflow-hidden border border-[#d4af37]/30 hover:border-[#ff8c00]/60 hover:shadow-[0_10px_36px_rgba(255,107,0,0.15)] transition-[border-color,box-shadow] duration-500"
+                onClick={() => setSelected(sant)}
+                className="group relative rounded-2xl overflow-hidden border border-[#d4af37]/30 hover:border-[#ff8c00]/60 hover:shadow-[0_10px_36px_rgba(255,107,0,0.15)] transition-[border-color,box-shadow] duration-500 cursor-zoom-in"
               >
                 <img
                   src={sant.img}
@@ -60,6 +63,8 @@ export default function SantGallery() {
           </p>
         </Reveal>
       </div>
+
+      <Lightbox src={selected?.img} alt={selected?.name} onClose={() => setSelected(null)} />
     </section>
   );
 }

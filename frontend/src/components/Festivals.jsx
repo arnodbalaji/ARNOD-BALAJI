@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Landmark } from "lucide-react";
 import { Reveal, SectionHeading } from "./Reveal";
 import MANDIR_CONFIG from "../config/mandirConfig";
+import { useSettings } from "../lib/useSettings";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Festivals() {
   const [showAll, setShowAll] = useState(false);
   const [live, setLive] = useState(null);
+  const settings = useSettings();
+  const customEvents = settings.customEvents || [];
 
   useEffect(() => {
     fetch(`${API}/festivals/upcoming`)
@@ -46,6 +49,28 @@ export default function Festivals() {
             <p className="inline-flex items-center gap-2 rounded-full border border-[#d4af37]/30 bg-[#d4af37]/5 px-5 py-2 text-xs sm:text-sm text-[#f3e5ab]/80">
               🪔 पंचांग-आधारित वास्तविक तिथियाँ — दिनांक एवं तिथि स्वतः अद्यतित
             </p>
+          </Reveal>
+        )}
+
+        {customEvents.length > 0 && (
+          <Reveal className="mb-12">
+            <h3 className="font-dev text-2xl text-gold-gradient text-center mb-6">🛕 मंदिर कार्यक्रम</h3>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {customEvents.map((ev, i) => (
+                <article
+                  key={`${ev.name}-${i}`}
+                  data-testid={`temple-event-${i + 1}`}
+                  className="glass-gold rounded-2xl p-6 border-[#ff8c00]/30"
+                >
+                  <span className="w-10 h-10 rounded-full bg-[#ff6b00]/10 border border-[#ff6b00]/30 flex items-center justify-center text-[#ff8c00]">
+                    <Landmark size={17} />
+                  </span>
+                  <h4 className="mt-4 font-dev text-xl text-[#f3e5ab]">{ev.name}</h4>
+                  {ev.date && <p className="mt-1.5 text-xs font-semibold text-[#ffb877]">{ev.date}</p>}
+                  {ev.desc && <p className="mt-2 text-sm text-[#fdfbf7]/60 leading-relaxed">{ev.desc}</p>}
+                </article>
+              ))}
+            </div>
           </Reveal>
         )}
 
