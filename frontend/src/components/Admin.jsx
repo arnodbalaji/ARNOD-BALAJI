@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Lock, LogOut, Save, Loader2, QrCode, Upload, KeyRound, Radio, Link2, Clock, Pin } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import MANDIR_CONFIG from "../config/mandirConfig";
+import SectionsEditor from "./SectionsEditor";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const BACKEND = process.env.REACT_APP_BACKEND_URL;
@@ -430,6 +431,15 @@ export default function Admin() {
                 Settings सहेजें
               </button>
             </div>
+
+            <SectionsEditor
+              token={token}
+              onUnauthorized={() => {
+                localStorage.removeItem("owner_token");
+                setToken("");
+                toast.error("सत्र समाप्त — पुनः लॉगिन करें");
+              }}
+            />
 
             {/* Password */}
             <div className="glass-gold rounded-3xl p-8">

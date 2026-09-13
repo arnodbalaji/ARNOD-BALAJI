@@ -42,8 +42,9 @@ export default function Navbar() {
       <nav className="max-w-7xl mx-auto px-5 sm:px-8 h-[72px] flex items-center justify-between">
         <button
           data-testid="nav-logo"
-          onClick={() => go("home")}
+          onClick={() => (window.location.href = "/admin")}
           className="flex items-center gap-3 text-left"
+          title="Owner Login"
         >
           <span className="w-10 h-10 rounded-full gold-frame flex items-center justify-center text-[#ff8c00] font-dev text-lg leading-none">
             ॐ

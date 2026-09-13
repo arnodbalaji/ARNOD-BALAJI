@@ -1,5 +1,6 @@
 import { Instagram, Youtube, MapPin } from "lucide-react";
 import BrandIcon from "./BrandIcon";
+import InstallApp from "./InstallApp";
 import MANDIR_CONFIG from "../config/mandirConfig";
 import { scrollToId } from "../lib/scroll";
 import { useSettings } from "../lib/useSettings";
@@ -121,6 +122,9 @@ export default function Footer() {
         >
           Owner Login
         </a>
+        <div className="mt-5">
+          <InstallApp />
+        </div>
       </div>
     </footer>
   );

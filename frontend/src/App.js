@@ -21,6 +21,7 @@ import Footer from "./components/Footer";
 import SanatanChat from "./components/SanatanChat";
 import Admin from "./components/Admin";
 import ShlokaOfDay from "./components/ShlokaOfDay";
+import CustomSections from "./components/CustomSections";
 import { setLenis } from "./lib/scroll";
 
 function App() {
@@ -66,6 +67,7 @@ function App() {
         <MusicSection />
         <InstagramSection />
         <Seva />
+        <CustomSections />
         <Contact />
       </main>
       <Footer />

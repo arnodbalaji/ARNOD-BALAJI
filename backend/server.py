@@ -525,9 +525,40 @@ async def upload_qr(request: Request, file: UploadFile = File(...)):
     return {"url": url}
 
 
+ALLOWED_MEDIA_TYPES = ALLOWED_IMAGE_TYPES | {
+    "audio/mpeg", "audio/mp4", "audio/mp3", "audio/ogg", "audio/wav",
+    "audio/x-m4a", "audio/aac", "audio/webm",
+}
+
+
+@api_router.post("/admin/upload")
+async def upload_media(request: Request, file: UploadFile = File(...)):
+    await get_owner(request)
+    if file.content_type not in ALLOWED_MEDIA_TYPES:
+        raise HTTPException(status_code=400, detail="केवल image या audio file अपलोड करें")
+    data = await file.read()
+    if len(data) > 20 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="फ़ाइल 20MB से छोटी होनी चाहिए")
+    ext = (file.filename.rsplit(".", 1)[-1].lower() if file.filename and "." in file.filename else "bin")
+    path = f"{APP_NAME}/uploads/media/{uuid.uuid4()}.{ext}"
+    result = put_object(path, data, file.content_type)
+    await db.files.insert_one(
+        {
+            "id": str(uuid.uuid4()),
+            "storage_path": result["path"],
+            "original_filename": file.filename,
+            "content_type": file.content_type,
+            "size": result["size"],
+            "is_deleted": False,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+    )
+    return {"url": f"/api/files/{result['path']}"}
+
+
 @api_router.get("/files/{path:path}")
 async def download_file(path: str):
-    if not path.startswith(f"{APP_NAME}/uploads/qr/"):
+    if not path.startswith(f"{APP_NAME}/uploads/"):
         raise HTTPException(status_code=403, detail="Forbidden")
     record = await db.files.find_one({"storage_path": path, "is_deleted": False})
     if not record:
@@ -755,7 +786,7 @@ async def youtube_media():
 
 
 # ---------------- Site Settings (owner CMS) ----------------
-SETTINGS_KEYS = ("live", "links", "schedule", "pinnedVideos", "instagramReels", "customEvents")
+SETTINGS_KEYS = ("live", "links", "schedule", "pinnedVideos", "instagramReels", "customEvents", "customSections")
 
 
 @api_router.get("/settings")
@@ -810,6 +841,10 @@ async def get_status_checks():
 
 
 app.include_router(api_router)
+
+from fastapi.middleware.gzip import GZipMiddleware
+
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 app.add_middleware(
     CORSMiddleware,
