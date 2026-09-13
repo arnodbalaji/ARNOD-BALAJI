@@ -15,6 +15,7 @@ import { YouTubeSection, InstagramSection } from "./components/Social";
 import MusicSection from "./components/Music";
 import Seva from "./components/Seva";
 import Saints from "./components/Saints";
+import SantGallery from "./components/SantGallery";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import SanatanChat from "./components/SanatanChat";
@@ -58,6 +59,7 @@ function App() {
         <History />
         <Schedule />
         <Panchang />
+        <SantGallery />
         <Festivals />
         <LiveDarshan />
         <YouTubeSection />
