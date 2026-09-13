@@ -5,6 +5,7 @@ export function armGreeting() {
   const play = async () => {
     window.removeEventListener("pointerdown", play);
     window.removeEventListener("scroll", play);
+    if (localStorage.getItem("sound_muted") === "1") return;
     localStorage.setItem("greeting_played", today);
     try {
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/audio/greeting`);

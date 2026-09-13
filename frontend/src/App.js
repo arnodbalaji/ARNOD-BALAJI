@@ -19,6 +19,7 @@ import SantGallery from "./components/SantGallery";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import SanatanChat from "./components/SanatanChat";
+import SoundToggle from "./components/SoundToggle";
 import Admin from "./components/Admin";
 import ShlokaOfDay from "./components/ShlokaOfDay";
 import CustomSections from "./components/CustomSections";
@@ -76,6 +77,7 @@ function App() {
       </main>
       <Footer />
       <SanatanChat />
+      <SoundToggle />
       <Toaster position="bottom-center" theme="dark" />
     </div>
   );

@@ -1,5 +1,5 @@
 export function playBellOnce() {
-  if (localStorage.getItem("bell_played")) return;
+  if (localStorage.getItem("bell_played") || localStorage.getItem("sound_muted") === "1") return;
   localStorage.setItem("bell_played", "1");
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
