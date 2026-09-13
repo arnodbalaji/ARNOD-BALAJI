@@ -50,6 +50,7 @@ Premium, modern techy-spiritual website for **Shri Sankat Haran Balaji Maharaj M
 - Google Maps exact share link (search link in use)
 
 ## Backlog
+- P1: Instagram reels embeds — send reel links to populate `instagramReels` in config (section ready, shows CTA until then)
 - ~~P1: Temple history section~~ ✅ DONE 2026-09-11 (स्वयंभू बालाजी, संत जगन्नाथ जी आगमन, चमत्कारों की आस्था, आस्था का पवित्र धाम)
 - P1: Festival dates auto-derived from panchang engine (currently editable static list)
 - P2: Photo gallery of mandir events

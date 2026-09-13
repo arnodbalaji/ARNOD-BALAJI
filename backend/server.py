@@ -676,6 +676,83 @@ async def shloka_today():
     return shloka
 
 
+# ---------------- YouTube Media (public RSS, no API key) ----------------
+YOUTUBE_CHANNELS = [
+    {"name": "Shri Sankat Haran Balaji Maharaj", "handle": "@sankatharanbalaji", "subscribe": "https://www.youtube.com/@sankatharanbalaji"},
+    {"name": "Arnod Balaji (Songs)", "handle": "@arnodbalaji", "subscribe": "https://www.youtube.com/@arnodbalaji"},
+]
+
+
+def _resolve_channel_id(handle: str):
+    import re
+
+    try:
+        r = _requests.get(
+            f"https://www.youtube.com/{handle}",
+            timeout=20,
+            headers={"User-Agent": "Mozilla/5.0"},
+        )
+        m = re.search(r'"channelId":"(UC[\w-]+)"', r.text) or re.search(r"channel_id=(UC[\w-]+)", r.text)
+        return m.group(1) if m else None
+    except Exception:
+        return None
+
+
+def _channel_videos(channel_id: str, limit: int = 8):
+    import xml.etree.ElementTree as ET
+
+    r = _requests.get(
+        f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}",
+        timeout=20,
+        headers={"User-Agent": "Mozilla/5.0"},
+    )
+    root = ET.fromstring(r.text)
+    ns = {"a": "http://www.w3.org/2005/Atom", "yt": "http://www.youtube.com/xml/schemas/2015"}
+    vids = []
+    for e in root.findall("a:entry", ns)[:limit]:
+        vid = e.find("yt:videoId", ns).text
+        vids.append(
+            {
+                "id": vid,
+                "title": e.find("a:title", ns).text,
+                "published": e.find("a:published", ns).text,
+                "thumb": f"https://i.ytimg.com/vi/{vid}/hqdefault.jpg",
+                "url": f"https://www.youtube.com/watch?v={vid}",
+            }
+        )
+    return vids
+
+
+@api_router.get("/media/youtube")
+async def youtube_media():
+    cached = await db.media_cache.find_one({"key": "youtube"}, {"_id": 0})
+    now = datetime.now(timezone.utc)
+    if cached and (now - datetime.fromisoformat(cached["ts"])).total_seconds() < 1800:
+        return cached["data"]
+    channels = []
+    for ch in YOUTUBE_CHANNELS:
+        cid = _resolve_channel_id(ch["handle"])
+        entry = {
+            **ch,
+            "channelId": cid,
+            "videos": [],
+            "liveUrl": f"https://www.youtube.com/{ch['handle']}/live",
+        }
+        if cid:
+            try:
+                entry["videos"] = _channel_videos(cid)
+            except Exception:
+                pass
+        channels.append(entry)
+    data = {"channels": channels}
+    await db.media_cache.update_one(
+        {"key": "youtube"},
+        {"$set": {"key": "youtube", "ts": now.isoformat(), "data": data}},
+        upsert=True,
+    )
+    return data
+
+
 class StatusCheck(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))

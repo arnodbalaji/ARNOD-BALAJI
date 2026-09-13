@@ -232,6 +232,9 @@ const MANDIR_CONFIG = {
     { label: "JioSaavn", sub: "Mandir Songs on JioSaavn", brand: "jiosaavn", url: "https://www.jiosaavn.com/artist/sri-sankatharan-balaji-maharaj-mandir-songs/Tm6H0vxApXQ_" },
   ],
 
+  // ---------- Instagram Reels (paste reel links here, e.g. "https://www.instagram.com/reel/ABC123/") ----------
+  instagramReels: [],
+
   // ---------- Panchang location (for calculations only) ----------
   panchang: { latitude: 24.13, longitude: 74.82 },
 };
