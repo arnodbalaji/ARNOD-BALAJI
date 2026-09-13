@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Flame } from "lucide-react";
 import MANDIR_CONFIG from "../config/mandirConfig";
 import { scrollToId } from "../lib/scroll";
+import InstallApp from "./InstallApp";
 
 const LINKS = [
   { id: "home", label: "Home" },
@@ -70,6 +71,7 @@ export default function Navbar() {
               {l.label}
             </button>
           ))}
+          <InstallApp className="ml-2 hidden xl:inline-flex !px-4 !py-2" />
           <button
             data-testid="nav-live-darshan-button"
             onClick={() => go("live-darshan")}
@@ -118,6 +120,7 @@ export default function Navbar() {
                 <Flame size={15} />
                 🙏 Live Darshan
               </button>
+              <InstallApp className="mb-3 w-full justify-center !py-3" />
             </div>
           </motion.div>
         )}

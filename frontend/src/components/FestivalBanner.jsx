@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { scrollToId } from "../lib/scroll";
+import { playBellOnce } from "../lib/bell";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -14,6 +15,21 @@ export default function FestivalBanner() {
       .then((d) => setNext(d.festivals?.[0] || null))
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!next || localStorage.getItem("bell_played")) return;
+    const arm = () => {
+      playBellOnce();
+      window.removeEventListener("pointerdown", arm);
+      window.removeEventListener("scroll", arm);
+    };
+    window.addEventListener("pointerdown", arm);
+    window.addEventListener("scroll", arm, { passive: true });
+    return () => {
+      window.removeEventListener("pointerdown", arm);
+      window.removeEventListener("scroll", arm);
+    };
+  }, [next]);
 
   if (!next) return null;
 
