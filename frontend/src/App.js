@@ -22,6 +22,7 @@ import SanatanChat from "./components/SanatanChat";
 import Admin from "./components/Admin";
 import ShlokaOfDay from "./components/ShlokaOfDay";
 import CustomSections from "./components/CustomSections";
+import FestivalBanner from "./components/FestivalBanner";
 import { setLenis } from "./lib/scroll";
 
 function App() {
@@ -54,6 +55,7 @@ function App() {
       <main>
         <Hero />
         <Marquee />
+        <FestivalBanner />
         <ShlokaOfDay />
         <Saints />
         <Explore />
