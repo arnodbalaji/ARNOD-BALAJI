@@ -1,4 +1,6 @@
 from fastapi import FastAPI, APIRouter, Query
+from fastapi.responses import StreamingResponse
+import json
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -252,6 +254,93 @@ async def get_upcoming_festivals():
             })
     out.sort(key=lambda f: f["date"])
     return {"festivals": out}
+
+
+class ChatRequest(BaseModel):
+    session_id: str
+    message: str
+
+
+SANATAN_SYSTEM = """You are "सनातन ज्ञान मित्र" (Sanatan Gyan Mitra) — a humble, wise Sanatan Dharma scholar-guide on the official website of Shri Sankat Haran Balaji Maharaj Mandir, Arnod, Pratapgarh, Rajasthan.
+
+You hold deep knowledge of the four Vedas, Upanishads, 18 Puranas, Ramayana, Mahabharata, Shrimad Bhagavad Gita, Hanuman Chalisa, Sunderkand, Hindu philosophy, festivals, puja vidhi, aarti and bhakti traditions.
+
+Rules:
+- Reply in the SAME language the devotee uses (Hindi, Hinglish or English). Prefer simple Hindi; where fitting, include a short Sanskrit shloka with its meaning.
+- Tone: humble, warm, devotional — like a learned temple pujari guiding a devotee. Never preachy.
+- When citing scripture, name the source (e.g., श्रीमद्भगवद्गीता अध्याय 2). If unsure of the exact verse number, describe the teaching and name only the text — never fabricate citations.
+- Keep answers concise (under ~180 words) unless the devotee asks for detail. Use short paragraphs.
+- Mandir facts you may share: प्रातः दर्शन 6 AM, प्रातः आरती 7 AM, मंदिर पूरे दिन खुला, शयन आरती 8 PM; मूर्ति स्वयंभू एवं जागृत मानी जाती है (स्थानीय मान्यता); मंदिर अरणोद, प्रतापगढ़, राजस्थान में स्थित है।
+- Do not invent miracles or historical claims about this mandir beyond the above.
+- Politely steer non-spiritual or harmful requests back to dharma and bhakti."""
+
+
+@api_router.post("/chat")
+async def sanatan_chat(req: ChatRequest):
+    from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
+
+    now = datetime.now(timezone.utc).isoformat()
+    await db.chat_messages.insert_one(
+        {"session_id": req.session_id, "role": "user", "content": req.message, "ts": now}
+    )
+    history = (
+        await db.chat_messages.find({"session_id": req.session_id}, {"_id": 0})
+        .sort("ts", 1)
+        .to_list(40)
+    )
+    context = "\n".join(
+        f"{'भक्त' if h['role'] == 'user' else 'ज्ञान मित्र'}: {h['content']}" for h in history[-13:-1]
+    )
+    prompt = (
+        f"पूर्व वार्तालाप:\n{context}\n\nभक्त का नया प्रश्न: {req.message}"
+        if context
+        else req.message
+    )
+
+    async def gen():
+        full = []
+        try:
+            chat = LlmChat(
+                api_key=os.environ.get("EMERGENT_LLM_KEY"),
+                session_id=f"sanatan-{req.session_id}-{uuid.uuid4()}",
+                system_message=SANATAN_SYSTEM,
+            ).with_model("openai", "gpt-5.4")
+            async for ev in chat.stream_message(UserMessage(text=prompt)):
+                if isinstance(ev, TextDelta):
+                    full.append(ev.content)
+                    yield f"data: {json.dumps({'token': ev.content})}\n\n"
+                elif isinstance(ev, StreamDone):
+                    break
+        except Exception as e:
+            logging.getLogger(__name__).error(f"chat error: {e}")
+            yield f"data: {json.dumps({'error': 'क्षमा करें, अभी उत्तर उपलब्ध नहीं हो पाया। कृपया पुनः प्रयास करें। 🙏'})}\n\n"
+        await db.chat_messages.insert_one(
+            {
+                "session_id": req.session_id,
+                "role": "assistant",
+                "content": "".join(full),
+                "ts": datetime.now(timezone.utc).isoformat(),
+            }
+        )
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(
+        gen(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+@api_router.get("/chat/history/{session_id}")
+async def get_chat_history(session_id: str):
+    msgs = (
+        await db.chat_messages.find(
+            {"session_id": session_id}, {"_id": 0, "role": 1, "content": 1}
+        )
+        .sort("ts", 1)
+        .to_list(100)
+    )
+    return {"messages": msgs}
 
 
 class StatusCheck(BaseModel):

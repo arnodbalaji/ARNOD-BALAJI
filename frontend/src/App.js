@@ -17,6 +17,7 @@ import Seva from "./components/Seva";
 import Saints from "./components/Saints";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
+import SanatanChat from "./components/SanatanChat";
 import { setLenis } from "./lib/scroll";
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
         <Contact />
       </main>
       <Footer />
+      <SanatanChat />
       <Toaster position="bottom-center" theme="dark" />
     </div>
   );
