@@ -41,8 +41,10 @@ Premium, modern techy-spiritual website for **Shri Sankat Haran Balaji Maharaj M
 - Instagram profile URL ✅ (2026-09-10: instagram.com/srisankatharanbalajimaharaj), YouTube channel URL ✅ (youtube.com/@sankatharanbalaji)
 - Official Google Maps share link (currently a maps search link in `mandirConfig.js`)
 - Name & title of the second (younger) sant — photo has no text; currently "पूज्य संत श्री" placeholder
-- Actual aarti/darshan timings (placeholders: "समय शीघ्र घोषित होगा")
+- Sant photos ✅ (2026-09-13: 140 sant/bhakt images in पूज्य संत परंपरा gallery, names from user's filenames, served from /public/sants)
+- Actual aarti timings ✅ (6 AM darshan, 7 AM aarti, all-day open, 8 PM shayan)
 - Official UPI QR image + bank details (empty by design)
+- Google Maps exact share link (search link in use)
 
 ## Backlog
 - ~~P1: Temple history section~~ ✅ DONE 2026-09-11 (स्वयंभू बालाजी, संत जगन्नाथ जी आगमन, चमत्कारों की आस्था, आस्था का पवित्र धाम)
